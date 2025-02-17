@@ -21,7 +21,7 @@ import java.util.Map;
 public class UserController {
     private final UserRepository userRepository;
     private  final PasswordEncoder passwordEncoder;
-
+    private boolean isAdmin;
     //вндрить пасворд енкодер
     @GetMapping("/public")
     public String endPointPublic() {
@@ -30,18 +30,20 @@ public class UserController {
 
     @GetMapping("/user")
     public String endPointUser() {
+
         return "Доступ разрешён Users";
     }
 
     @GetMapping("/admin")
     public String endPointAdmin() {
+        isAdmin = true;
         return "Доступ разрешён Admins";
     }
 
     @PostMapping("/create") //принять юзера и добавить
     public String createResource(@RequestBody  User user) {
         //pакодировать паролль
-        if(user.getRole() == Role.USER) {
+        if(user.getRole().equals(Role.USER) && isAdmin) {
             user.setRole(Role.USER);
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             userRepository.save(user);
