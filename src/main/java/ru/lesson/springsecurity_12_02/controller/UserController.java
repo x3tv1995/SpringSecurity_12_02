@@ -3,9 +3,12 @@ package ru.lesson.springsecurity_12_02.controller;
 
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import ru.lesson.springsecurity_12_02.model.entity.User;
+import ru.lesson.springsecurity_12_02.model.enums.Role;
 import ru.lesson.springsecurity_12_02.repository.UserRepository;
 
 import java.time.LocalDateTime;
@@ -14,8 +17,10 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
+@Slf4j
 public class UserController {
     private final UserRepository userRepository;
+    private  final PasswordEncoder passwordEncoder;
 
     //вндрить пасворд енкодер
     @GetMapping("/public")
@@ -34,9 +39,15 @@ public class UserController {
     }
 
     @PostMapping("/create") //принять юзера и добавить
-    public String createResource(User user) {
+    public String createResource(@RequestBody  User user) {
         //pакодировать паролль
-        userRepository.save(user);
+        if(user.getRole() == Role.USER) {
+            user.setRole(Role.USER);
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            userRepository.save(user);
+        }else{
+            return "Войдите как админ";
+        }
         return "Ресурс/пользователь добавлен";
     }
 
