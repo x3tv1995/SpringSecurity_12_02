@@ -36,14 +36,14 @@ public class UserController {
 
     @GetMapping("/admin")
     public String endPointAdmin() {
-        isAdmin = true;
+
         return "Доступ разрешён Admins";
     }
 
     @PostMapping("/create") //принять юзера и добавить
     public String createResource(@RequestBody  User user) {
-        //pакодировать паролль
-        if(user.getRole().equals(Role.USER) && isAdmin) {
+        //раскодировать пароль
+        if(user.getRole().equals(Role.USER)) {
             user.setRole(Role.USER);
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             userRepository.save(user);
